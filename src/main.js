@@ -10,14 +10,14 @@ const VSHEADER_SOURCE =
   'attribute vec4 position;' +
   'uniform mat4 rect;' +
   'void main() {\n' +
-    'gl_Position = position * rect;\n' +
+    'gl_Position = rect * position;\n' +
     'gl_PointSize = 10.0;\n' +
   '}';
 
 //片元着色器
 const FSHEADER_SOURCE =
   'void main() { \n' +
-    'gl_FragColor = vec4(0, 0, 1, 1);\n' +
+    'gl_FragColor = vec4(gl_FragCoord.x / 300, 0, gl_FragCoord.y / 150, 1);\n' +
   '}';
 
 if(!initShaders(gl, VSHEADER_SOURCE, FSHEADER_SOURCE)) {
@@ -32,9 +32,9 @@ angle.oninput = function() {
 };
 
 
-gl.clearColor(255, 255, 255, 1);
-
-gl.clear(gl.COLOR_BUFFER_BIT);
+//gl.clearColor(255, 255, 255, 1);
+//
+//gl.clear(gl.COLOR_BUFFER_BIT);
 
 //创建缓冲区
 function initVertexBuffers(gl) {

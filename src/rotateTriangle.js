@@ -10,7 +10,7 @@ const VSHEADER_SOURCE =
   'attribute vec4 position;' +
   'uniform mat4 rect;' +
   'void main() {\n' +
-  'gl_Position = position * rect;\n' +
+  'gl_Position = rect  * position;\n' +
   'gl_PointSize = 10.0;\n' +
   '}';
 
