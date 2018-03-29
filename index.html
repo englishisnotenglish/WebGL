@@ -1,19 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>WebGl test</title>
-    <style>
-        #canvas {
-            border: 1px solid black;
-        }    </style>
-</head>
-<body>
-    <canvas id="canvas"></canvas>
-    <input id="angle" min="0" max="360" value="0" type="range"/>
-    <script src="./lib/webgl-utils.js"></script>
-    <script src="./lib/webgl-debug.js"></script>
-    <script src="./lib/cuon-utils.js"></script>
-    <script src="./src/rotateTriangle.js"></script>
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <title>WebGl test</title>
+        <style>
+            #canvas {
+                border: 1px solid black;
+                width: 800px;
+                height: 800px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <canvas id="canvas" width="800px" height="800px"></canvas>
+
+        <input id="angle"  min="0" max="360" value="0" type="range"/>
+
+        <script src="./lib/webgl-utils.js"></script>
+        <script src="./lib/webgl-debug.js"></script>
+        <script src="./lib/cuon-utils.js"></script>
+        <script src="./src/square.js"></script>
+    </body>
 </html>

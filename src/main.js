@@ -41,7 +41,6 @@ function initVertexBuffers(gl) {
     -0.5, 0.5, 0, 1,
     0.5, -0.5, 1, 0,
     -0.5, -0.5, 0, 0
-
   ]);
 
   var n = 4;
@@ -77,15 +76,15 @@ function initTexture() {
   img.src = './Omhy-fypatmw5816858.jpg';
 }
 
-//将图片的纹素给片元
+// 将图片的纹素给片元
 function loadTexture(gl, n, texture, sampler, image) {
-  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1); //将纹理图像Y轴翻转
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1); // 将纹理图像Y轴翻转
 
-  gl.activeTexture(gl.TEXTURE0); //开启0号纹理
+  gl.activeTexture(gl.TEXTURE0); // 开启0号纹理
 
-  gl.bindTexture(gl.TEXTURE_2D, texture); //绑定纹理
+  gl.bindTexture(gl.TEXTURE_2D, texture); // 绑定纹理
 
-  //配置纹理参数
+  // 配置纹理参数
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -93,10 +92,9 @@ function loadTexture(gl, n, texture, sampler, image) {
 
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);//配置纹理图像
 
-  gl.uniform1i(sampler, 0); //0号纹理给unifrom;
+  gl.uniform1i(sampler, 0); // 0号纹理给unifrom;
 
-  gl.drawArrays(gl.TRIANGLE_STRIP,0,n);
-  //gl.drawArrays(gl.LINE_LOOP,0,n);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, n);
 }
 
 initTexture();
