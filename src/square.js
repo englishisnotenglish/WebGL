@@ -5,9 +5,9 @@ const canvas = document.querySelector("#canvas"),
   angle = document.querySelector('#angle'),
   gl = canvas.getContext('webgl');
 
-canvas.addEventListener('click', function (ev) {
-  console.log(ev.clientX, ev.clientY);
-});
+// canvas.addEventListener('click', function (ev) {
+//   console.log(ev.clientX, ev.clientY);
+// });
 
 const center = [0, 0],
   radius = 100,
@@ -22,6 +22,7 @@ const VSHEADER_SOURCE =
   'varying vec2 vPicPosition;\n' +
   'void main() {\n' +
     'gl_Position = position;\n' +
+    'gl_PointSize = 10.0;\n' +
     'vPicPosition = picPosition;\n' +
     'color = vColor;\n' +
   '}';
@@ -65,10 +66,14 @@ function initVertexBuffers(gl) {
     topOffsetY = center[1] + ry,
     bottomOffsetY = center[1] - ry;
   var vertices = new Float32Array([
-    rightOffsetX, bottomOffsetY, rightOffsetX * percent, bottomOffsetY * percent, 0, 1, 0, 1, 0,
-    rightOffsetX, topOffsetY, rightOffsetX * percent, topOffsetY * percent, 1, 0, 0, 1, 1,
-    leftOffsetX, bottomOffsetY, leftOffsetX * percent, bottomOffsetY * percent, 0, 0, 1, 0, 0,
-    leftOffsetX, topOffsetY, leftOffsetX * percent, topOffsetY * percent, 0, 0, 1, 0, 1,
+    rightOffsetX * percent, bottomOffsetY * percent, 0, 1, 0, 1, 0,
+    rightOffsetX * percent, topOffsetY * percent, 1, 0, 0, 1, 1,
+    leftOffsetX * percent, bottomOffsetY * percent, 0, 0, 1, 0, 0,
+    leftOffsetX * percent, topOffsetY * percent, 0, 0, 1, 0, 1,
+    rightOffsetX, bottomOffsetY, 0, 1, 0, 1, 0,
+    rightOffsetX, topOffsetY, 1, 0, 0, 1, 1,
+    leftOffsetX, bottomOffsetY, 0, 0, 1, 0, 0,
+    leftOffsetX, topOffsetY, 0, 0, 1, 0, 1,
   ]);
 
   var n = 4;
@@ -80,22 +85,21 @@ function initVertexBuffers(gl) {
   gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
   const position = gl.getAttribLocation(gl.program, 'position'),
-    vColor = gl.getAttribLocation(gl.program, 'vColor'),
-    //picPosition = gl.getAttribLocation(gl.program, 'picPosition'),
+    // vColor = gl.getAttribLocation(gl.program, 'vColor'),
+    // picPosition = gl.getAttribLocation(gl.program, 'picPosition'),
     fsize = vertices.BYTES_PER_ELEMENT;
-  gl.vertexAttribPointer(position, 2, gl.FLOAT, false, fsize * 9, 0);
-  //gl.vertexAttribPointer(picPosition, 2, gl.FLOAT, false, fsize * 9, fsize * 7);
-  gl.vertexAttribPointer(vColor, 3, gl.FLOAT, false, fsize * 9, fsize * 4);
+  gl.vertexAttribPointer(position, 2, gl.FLOAT, false, fsize * 7, 0);
+  //gl.vertexAttribPointer(picPosition, 2, gl.FLOAT, false, fsize * 7, fsize * 7);
+  //gl.vertexAttribPointer(vColor, 3, gl.FLOAT, false, fsize * 7, fsize * 4);
 
   gl.enableVertexAttribArray(position);
-  gl.enableVertexAttribArray(vColor);
+  //gl.enableVertexAttribArray(vColor);
   //gl.enableVertexAttribArray(picPosition);
-
-  gl.drawArrays(gl.LINE_LOOP, 0, n);
   return n;
 }
 
 const n = initVertexBuffers(gl);
+gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
 
 function initTexture() {
   const texture = gl.createTexture(),
@@ -107,10 +111,10 @@ function initTexture() {
     const position = gl.getAttribLocation(gl.program, 'position'),
       picPosition = gl.getAttribLocation(gl.program, 'picPosition'),
       fsize = 4;
-    gl.vertexAttribPointer(position, 2, gl.FLOAT, false, fsize * 9, fsize * 2);
-    gl.vertexAttribPointer(picPosition, 2, gl.FLOAT, false, fsize * 9, fsize * 7);
+    //gl.vertexAttribPointer(position, 2, gl.FLOAT, false, fsize * 7, fsize * 2);
+    gl.vertexAttribPointer(picPosition, 2, gl.FLOAT, false, fsize * 7, fsize * 5);
 
-    gl.enableVertexAttribArray(position);
+    //gl.enableVertexAttribArray(position);
     gl.enableVertexAttribArray(picPosition);
 
     loadTexture(gl, n, texture, sampler, img);
@@ -136,7 +140,7 @@ function loadTexture(gl, n, texture, sampler, image) {
 
   gl.uniform1i(sampler, 0); // 0号纹理给unifrom;
 
-  gl.drawArrays(gl.TRIANGLE_STRIP, 0, n);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 4, n);
 }
 
 initTexture();
