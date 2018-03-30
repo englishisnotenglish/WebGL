@@ -10,7 +10,8 @@ canvas.addEventListener('click', function (ev) {
 });
 
 const center = [0, 0],
-  radius = 100;
+  radius = 100,
+  percent = 0.8;
 
 // 顶点着色器
 const VSHEADER_SOURCE =
@@ -46,11 +47,9 @@ if(!initShaders(gl, VSHEADER_SOURCE, FSHEADER_SOURCE)) {
 //   gl.drawArrays(gl.TRIANGLES, 0, n);
 // };
 
-
-
-gl.clearColor(255, 255, 255, 1);
-
-gl.clear(gl.COLOR_BUFFER_BIT);
+// gl.clearColor(255, 255, 255, 1);
+//
+// gl.clear(gl.COLOR_BUFFER_BIT);
 
 // 创建缓冲区
 function initVertexBuffers(gl) {
@@ -60,12 +59,16 @@ function initVertexBuffers(gl) {
     ry = radius /height;
   center[0] /= width;
   center[1] /= height;
-
+  
+  const rightOffsetX = center[0] + rx,
+    leftOffsetX = center[0] - rx,
+    topOffsetY = center[1] + ry,
+    bottomOffsetY = center[1] - ry;
   var vertices = new Float32Array([
-    center[0] + rx, center[1] + ry, 1, 0, 0,
-    center[0] + rx, center[1] - ry, 0, 1, 0,
-    center[0] - rx, center[1] - ry, 0, 0, 1,
-    center[0] - rx, center[1] + ry, 0, 0, 1,
+    rightOffsetX, bottomOffsetY, rightOffsetX * percent, bottomOffsetY * percent, 0, 1, 0, 1, 0,
+    rightOffsetX, topOffsetY, rightOffsetX * percent, topOffsetY * percent, 1, 0, 0, 1, 1,
+    leftOffsetX, bottomOffsetY, leftOffsetX * percent, bottomOffsetY * percent, 0, 0, 1, 0, 0,
+    leftOffsetX, topOffsetY, leftOffsetX * percent, topOffsetY * percent, 0, 0, 1, 0, 1,
   ]);
 
   var n = 4;
@@ -78,16 +81,17 @@ function initVertexBuffers(gl) {
 
   const position = gl.getAttribLocation(gl.program, 'position'),
     vColor = gl.getAttribLocation(gl.program, 'vColor'),
-    picPosition = gl.getAttribLocation(gl.program, 'picPosition'),
+    //picPosition = gl.getAttribLocation(gl.program, 'picPosition'),
     fsize = vertices.BYTES_PER_ELEMENT;
-  gl.vertexAttribPointer(position, 2, gl.FLOAT, false, fsize * 5, 0);
-  gl.vertexAttribPointer(picPosition, 2, gl.FLOAT, false, fsize * 5, 0);
-  gl.vertexAttribPointer(vColor, 3, gl.FLOAT, false, fsize * 5, fsize * 2);
+  gl.vertexAttribPointer(position, 2, gl.FLOAT, false, fsize * 9, 0);
+  //gl.vertexAttribPointer(picPosition, 2, gl.FLOAT, false, fsize * 9, fsize * 7);
+  gl.vertexAttribPointer(vColor, 3, gl.FLOAT, false, fsize * 9, fsize * 4);
 
   gl.enableVertexAttribArray(position);
   gl.enableVertexAttribArray(vColor);
-  gl.enableVertexAttribArray(picPosition);
+  //gl.enableVertexAttribArray(picPosition);
 
+  gl.drawArrays(gl.LINE_LOOP, 0, n);
   return n;
 }
 
@@ -99,6 +103,16 @@ function initTexture() {
 
   const img = new Image();
   img.onload = function() {
+
+    const position = gl.getAttribLocation(gl.program, 'position'),
+      picPosition = gl.getAttribLocation(gl.program, 'picPosition'),
+      fsize = 4;
+    gl.vertexAttribPointer(position, 2, gl.FLOAT, false, fsize * 9, fsize * 2);
+    gl.vertexAttribPointer(picPosition, 2, gl.FLOAT, false, fsize * 9, fsize * 7);
+
+    gl.enableVertexAttribArray(position);
+    gl.enableVertexAttribArray(picPosition);
+
     loadTexture(gl, n, texture, sampler, img);
   };
   img.src = './Omhy-fypatmw5816858.jpg';
@@ -127,7 +141,7 @@ function loadTexture(gl, n, texture, sampler, image) {
 
 initTexture();
 
-gl.drawArrays(gl.LINE_LOOP, 0, n);
+//gl.drawArrays(gl.LINE_LOOP, 0, n);
 // function setUniform(angle) {
 //   const cosA = Math.cos(angle / 180 * Math.PI),
 //     sinA = Math.sin(angle / 180 * Math.PI);

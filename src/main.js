@@ -92,7 +92,7 @@ function loadTexture(gl, n, texture, sampler, image) {
 
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);//配置纹理图像
 
-  gl.uniform1i(sampler, 0); // 0号纹理给unifrom;
+  gl.uniform1i(sampler, 0); // 0号纹理给uniform;
 
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, n);
 }
