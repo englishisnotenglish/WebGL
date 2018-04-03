@@ -14,28 +14,31 @@ const center = [0, 0],
   percent = 0.8;
 
 // 顶点着色器
-const VSHEADER_SOURCE =
-  'attribute vec4 position;\n' +
-  'attribute vec4 vColor;\n' +
-  'attribute vec2 picPosition;\n' +
-  'varying vec4 color;\n' +
-  'varying vec2 vPicPosition;\n' +
-  'void main() {\n' +
-    'gl_Position = position;\n' +
-    'gl_PointSize = 10.0;\n' +
-    'vPicPosition = picPosition;\n' +
-    'color = vColor;\n' +
-  '}';
+const VSHEADER_SOURCE = `
+  attribute vec2 position;
+  attribute vec2 picPosition;
+  varying vec2 vPicPosition;
+  void main() {
+    gl_Position =  vec4(position, 0, 1);
+    vPicPosition = picPosition;
+  }
+`;
 
 // 片元着色器
-const FSHEADER_SOURCE =
-  'precision mediump float;' +
-  'varying vec4 color;' +
-  'varying vec2 vPicPosition;' +
-  'uniform sampler2D u_Sampler; \n' +
-  'void main() { \n' +
-    'gl_FragColor = texture2D(u_Sampler, vPicPosition); \n' +
-  '}';
+const FSHEADER_SOURCE = `
+  precision mediump float;
+  varying vec4 color;
+  uniform int uColorType;
+  varying vec2 vPicPosition;
+  uniform sampler2D u_Sampler;
+  void main() {
+    if (uColorType == 0) {
+      gl_FragColor = texture2D(u_Sampler, vPicPosition);
+    } else {
+      gl_FragColor = vec4(0.5, 0.5, 0.5, 1);
+    }
+  }
+`;
 
 if(!initShaders(gl, VSHEADER_SOURCE, FSHEADER_SOURCE)) {
   console.log('failed to init the shader');
@@ -66,40 +69,77 @@ function initVertexBuffers(gl) {
     topOffsetY = center[1] + ry,
     bottomOffsetY = center[1] - ry;
   var vertices = new Float32Array([
-    rightOffsetX * percent, bottomOffsetY * percent, 0, 1, 0, 1, 0,
-    rightOffsetX * percent, topOffsetY * percent, 1, 0, 0, 1, 1,
-    leftOffsetX * percent, bottomOffsetY * percent, 0, 0, 1, 0, 0,
-    leftOffsetX * percent, topOffsetY * percent, 0, 0, 1, 0, 1,
-    rightOffsetX, bottomOffsetY, 0, 1, 0, 1, 0,
-    rightOffsetX, topOffsetY, 1, 0, 0, 1, 1,
-    leftOffsetX, bottomOffsetY, 0, 0, 1, 0, 0,
-    leftOffsetX, topOffsetY, 0, 0, 1, 0, 1,
+    rightOffsetX, bottomOffsetY,
+    rightOffsetX, topOffsetY,
+    leftOffsetX, bottomOffsetY,
+    leftOffsetX, topOffsetY,
+    rightOffsetX * percent, bottomOffsetY * percent,
+    rightOffsetX * percent, topOffsetY * percent,
+    leftOffsetX * percent, bottomOffsetY * percent,
+    leftOffsetX * percent, topOffsetY * percent,
+    rightOffsetX, topOffsetY,
+    rightOffsetX * percent, topOffsetY * percent,
+    rightOffsetX, bottomOffsetY,
+    rightOffsetX * percent, bottomOffsetY * percent,
+    leftOffsetX, bottomOffsetY,
+    leftOffsetX * percent, bottomOffsetY * percent,
+    leftOffsetX, topOffsetY,
+    leftOffsetX * percent, topOffsetY * percent,
+    rightOffsetX, topOffsetY,
+    rightOffsetX * percent, topOffsetY * percent,
   ]);
 
-  var n = 4;
+  var texcoords = new Float32Array([
+    0, 0,
+    0, 0,
+    0, 0,
+    0, 0,
+    1, 0,
+    1, 1,
+    0, 0,
+    0, 1,
+    0, 0,
+    0, 0,
+    0, 0,
+    0, 0,
+    1, 0,
+    1, 1,
+    0, 0,
+    0, 1,
+    0, 0,
+    0, 0,
+  ]);
 
+  const position = gl.getAttribLocation(gl.program, 'position'),
+    uColorType = gl.getUniformLocation(gl.program, 'uColorType'),
+    picPosition = gl.getAttribLocation(gl.program, 'picPosition'),
+    fsize = vertices.BYTES_PER_ELEMENT;
+
+  var n = 8;
+
+  gl.uniform1i(uColorType, 0);
   var vertexBuffers = gl.createBuffer();
   if(!vertexBuffers) console.log('init vertex buffers failed');
 
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffers);
   gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
-  const position = gl.getAttribLocation(gl.program, 'position'),
-    // vColor = gl.getAttribLocation(gl.program, 'vColor'),
-    // picPosition = gl.getAttribLocation(gl.program, 'picPosition'),
-    fsize = vertices.BYTES_PER_ELEMENT;
-  gl.vertexAttribPointer(position, 2, gl.FLOAT, false, fsize * 7, 0);
-  //gl.vertexAttribPointer(picPosition, 2, gl.FLOAT, false, fsize * 7, fsize * 7);
-  //gl.vertexAttribPointer(vColor, 3, gl.FLOAT, false, fsize * 7, fsize * 4);
-
+  gl.vertexAttribPointer(position, 2, gl.FLOAT, false, fsize * 2, 0);
   gl.enableVertexAttribArray(position);
-  //gl.enableVertexAttribArray(vColor);
-  //gl.enableVertexAttribArray(picPosition);
-  return n;
+
+  var texBuffers = gl.createBuffer();
+  if(!texBuffers) console.log('init texBuffers failed');
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, texBuffers);
+  gl.bufferData(gl.ARRAY_BUFFER, texcoords, gl.STATIC_DRAW);
+
+  gl.vertexAttribPointer(picPosition, 2, gl.FLOAT, false, fsize * 2, 0);
+  gl.enableVertexAttribArray(picPosition);
+  return 8;
 }
 
 const n = initVertexBuffers(gl);
-gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+
 
 function initTexture() {
   const texture = gl.createTexture(),
@@ -107,16 +147,6 @@ function initTexture() {
 
   const img = new Image();
   img.onload = function() {
-
-    const position = gl.getAttribLocation(gl.program, 'position'),
-      picPosition = gl.getAttribLocation(gl.program, 'picPosition'),
-      fsize = 4;
-    //gl.vertexAttribPointer(position, 2, gl.FLOAT, false, fsize * 7, fsize * 2);
-    gl.vertexAttribPointer(picPosition, 2, gl.FLOAT, false, fsize * 7, fsize * 5);
-
-    //gl.enableVertexAttribArray(position);
-    gl.enableVertexAttribArray(picPosition);
-
     loadTexture(gl, n, texture, sampler, img);
   };
   img.src = './Omhy-fypatmw5816858.jpg';
@@ -124,6 +154,7 @@ function initTexture() {
 
 // 将图片的纹素给片元
 function loadTexture(gl, n, texture, sampler, image) {
+  const uColorType = gl.getUniformLocation(gl.program, 'uColorType');
   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1); // 将纹理图像Y轴翻转
 
   gl.activeTexture(gl.TEXTURE0); // 开启0号纹理
@@ -140,7 +171,9 @@ function loadTexture(gl, n, texture, sampler, image) {
 
   gl.uniform1i(sampler, 0); // 0号纹理给unifrom;
 
-  gl.drawArrays(gl.TRIANGLE_STRIP, 4, n);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 4, 4);
+  gl.uniform1i(uColorType, 1);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 8, 10);
 }
 
 initTexture();
