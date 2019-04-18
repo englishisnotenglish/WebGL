@@ -4,41 +4,17 @@ const webpack = require('webpack'),
 
 const EXAMPLES = {
   basic: {
-    id: 'basic',
-    title: 'Basic'
+    id: 'main',
+    title: 'Main'
   },
   components: {
-    id: 'components',
-    title: 'Connected Components'
+    id: 'rotateTriangle',
+    title: 'Rotate Triangle'
   },
   drag: {
-    id: 'drag',
-    title: 'Drag'
+    id: 'square',
+    title: 'Square'
   },
-  events: {
-    id: 'events',
-    title: 'Events'
-  },
-  gexf: {
-    id: 'gexf',
-    title: 'GEXF'
-  },
-  layout: {
-    id: 'layout',
-    title: 'Force Atlas 2 Layout'
-  },
-  performance: {
-    id: 'performance',
-    title: 'Performance'
-  },
-  animations: {
-    id: 'animations',
-    title: 'Animations'
-  },
-  tiny: {
-    id: 'tiny',
-    title: 'Tiny graph'
-  }
 };
 
 const entry = {};
@@ -56,7 +32,7 @@ const plugins = [
 for (const key in EXAMPLES) {
   const example = EXAMPLES[key];
 
-  entry[key] = `./${example.id}.js`;
+  entry[key] = `./src/${example.id}.js`;
 
   plugins.push(new HtmlWebpackPlugin({
     filename: `${example.id}.html`,
@@ -85,7 +61,18 @@ module.exports = {
         test: /\.(?:glsl|gexf)$/,
         exclude: /node_modules/,
         loader: 'raw-loader'
-      }
+      },
+      { test: /\.(jpg|png|gif|bmp|jpeg)$/,//正则表达式匹配图片规则
+        use: [{
+        loader:'url-loader',
+        options:{
+            limit:8192,//限制打包图片的大小：
+            //如果大于或等于8192Byte，则按照相应的文件名和路径打包图片；如果小于8192Byte，则将图片转成base64格式的字符串。
+            name:'images/[name]-[hash:8].[ext]',//images:图片打包的文件夹；
+            //[name].[ext]：设定图片按照本来的文件名和扩展名打包，不用进行额外编码
+            //[hash:8]：一个项目中如果两个文件夹中的图片重名，打包图片就会被覆盖，加上hash值的前八位作为图片名，可以避免重名。
+        }
+        }]}
     ]
   },
   plugins,

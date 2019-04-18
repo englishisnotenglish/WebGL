@@ -2,6 +2,8 @@
  * Created by wjz on 2017/11/20.
  * This is texture testing, I will use a pic from website.
  */
+
+ import bg from '../resource/Omhy-fypatmw5816858.jpg';
 const canvas = document.querySelector("#canvas"),
    gl = canvas.getContext('webgl');
 
@@ -73,7 +75,7 @@ function initTexture() {
   img.onload = function() {
     loadTexture(gl, n, texture, sampler, img);
   };
-  img.src = './Omhy-fypatmw5816858.jpg';
+  img.src = bg;
 }
 
 // 将图片的纹素给片元

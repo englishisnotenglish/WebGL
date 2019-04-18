@@ -1,6 +1,8 @@
 /**
  * Created by wjz on 2018/3/20.
  */
+import bg from '../resource/Omhy-fypatmw5816858.jpg';
+
 const canvas = document.querySelector("#canvas"),
   angle = document.querySelector('#angle'),
   gl = canvas.getContext('webgl');
@@ -149,7 +151,7 @@ function initTexture() {
   img.onload = function() {
     loadTexture(gl, n, texture, sampler, img);
   };
-  img.src = './Omhy-fypatmw5816858.jpg';
+  img.src = bg;
 }
 
 // 将图片的纹素给片元
