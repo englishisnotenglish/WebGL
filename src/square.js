@@ -141,7 +141,7 @@ function initVertexBuffers(gl) {
 }
 
 const n = initVertexBuffers(gl);
-
+let ctx = null;
 
 function initTexture() {
   const texture = gl.createTexture(),
@@ -149,7 +149,7 @@ function initTexture() {
 
   const img = new Image();
   img.onload = function() {
-    loadTexture(gl, n, texture, sampler, img);
+    loadTexture(gl, n, texture, sampler, ctx.canvas);
   };
   img.src = bg;
 }
@@ -178,22 +178,25 @@ function loadTexture(gl, n, texture, sampler, image) {
   gl.drawArrays(gl.TRIANGLE_STRIP, 8, 10);
 }
 
+function createTexture(id) {
+  const c = document.createElement('canvas');
+  ctx = c.getContext('2d');
+  
+
+
+
+  ctx.beginPath();
+  ctx.textAlign = 'left';
+  ctx.fillStyle = 'white'
+  ctx.font = '20px Arial';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('12311111111111123', 0, 0);
+}
+
+createTexture();
+
 initTexture();
 
-//gl.drawArrays(gl.LINE_LOOP, 0, n);
-// function setUniform(angle) {
-//   const cosA = Math.cos(angle / 180 * Math.PI),
-//     sinA = Math.sin(angle / 180 * Math.PI);
-//   var vertices = new Float32Array([
-//     cosA, -sinA, 0, 0,
-//     sinA, cosA, 0, 0,
-//     0, 0, 1, 0,
-//     0, 0, 0, 1
-//   ]);
-//
-//   const unifrom = gl.getUniformLocation(gl.program, 'rect');
-//   gl.uniformMatrix4fv(unifrom, false, vertices);
-// }
 
 
 
