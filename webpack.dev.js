@@ -15,6 +15,10 @@ const EXAMPLES = {
     id: 'square',
     title: 'Square'
   },
+  d3: {
+    id: 'threeD',
+    title: '3d'
+  },
 };
 
 const entry = {};
