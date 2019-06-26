@@ -6,20 +6,21 @@ function getAndEnableAttribute(gl, name) {
 }
 
 
-function getAndEnableUniform(gl, name) {
+function getUniformLocation(gl, name) {
     return gl.getUniformLocation(gl.program, name);
 }
 
-function createAndPutBuffer(gl, vertices) {
+function createAndPutBuffer(gl, vertices, mode) {
+    mode = mode || gl.ARRAY_BUFFER;
     var vertexBuffers = gl.createBuffer();
     if(!vertexBuffers) console.log('init vertex buffers failed');
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffers);
-    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+    gl.bindBuffer(mode, vertexBuffers);
+    gl.bufferData(mode, vertices, gl.STATIC_DRAW);
 }
 
 export {
     getAndEnableAttribute,
-    getAndEnableUniform,
+    getUniformLocation,
     createAndPutBuffer,
 }
