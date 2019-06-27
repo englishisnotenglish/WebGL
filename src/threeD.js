@@ -38,7 +38,8 @@ if (!initShaders(gl, VSHEADER_SOURCE, FSHEADER_SOURCE)) {
 }
 
 
-let viewMatrix = null;
+let viewMatrix = null,
+    perspectiveMatrix = null;
 
 const a_triangle = getAndEnableAttribute(gl, 'a_triangle'),
     u_viewMatrix = getUniformLocation(gl, 'u_viewMatrix');
@@ -98,32 +99,28 @@ function initVertexBuffers(gl) {
     gl.vertexAttribPointer(a_triangle, 3, gl.FLOAT, false, size * 3, 0);
 
     viewMatrix = new Matrix4();
-    viewMatrix.setPerspective(
-        1, 1, 1, 100,
+    perspectiveMatrix = new Matrix4();
+    perspectiveMatrix.setPerspective(
+        90, 1, 1, 10,
     );
     viewMatrix.setLookAt(
-        0, 0,  .5,
-        0, 0, -0.25, 
+        0, 0,  0,
+        -100, 0,  -100, 
         0, 1, 0,
     );
 
     gl.uniformMatrix4fv(u_viewMatrix, false, viewMatrix.elements);
+    gl.uniformMatrix4fv(u_perspective, false, perspectiveMatrix.elements);
 
     return index.length;
 }
 
 const n = initVertexBuffers(gl);
 
-let eye = {
-    x: 0, 
-    y:0,
-    z: 0.5,
-}
-function setLookAt() {
-    const { x, y, z }  = eye;
+function setLookAt(x, y, z = 0) {
     viewMatrix.setLookAt(
-       x, y, z,
-        0, 0, 0, 
+       -x * 100, 0, -y * 100,
+       0, 0, 0,
         0, 1, 0,
     );
 
@@ -139,26 +136,10 @@ canvas.addEventListener('mousemove', (e) => {
     let x = (clientX - halfW) / halfW,
         y = (halfH - clientY) / halfH;
 
-    eye.x = x;
-    eye.y = y;
-    setLookAt();
-});
-
-document.addEventListener('keydown', (e) => {
-   let { z } = eye;
-    if (e.code === 'ArrowLeft') {
-        z += .1;
-    } else if (e.code === 'ArrowRight') {
-        z -= .1;
-    }
-    eye.z = z;
-
-    console.log(z, 'z is z ');
-    setLookAt();
+    setLookAt(x, y);
 });
 
 gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_BYTE, 0);
-// gl.drawArrays(gl.TRIANGLES, 0, n);
 
 
 
